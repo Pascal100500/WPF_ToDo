@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Microsoft.Win32;
+using System.Windows;
 using ViewModel;
 
 namespace View
@@ -8,25 +9,37 @@ namespace View
     /// </summary>
     public partial class ToDo : Window
     {
+        private readonly ToDoViewModel toDoViewModel = new();
+
         public ToDo()
         {
             InitializeComponent();
-            DataContext = new ToDoViewModel();
-        }
-
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-
+            DataContext = toDoViewModel;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            var saveFileDialog = new SaveFileDialog
+            {
+                FileName = "tasks.txt",
+                
+            };
 
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                toDoViewModel.SaveToFileCommandExecute(saveFileDialog.FileName);
+            }
         }
 
-        //private void Button_Click_1(object sender, RoutedEventArgs e)
-        //{
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog();
+            
 
-        //}
+            if (openFileDialog.ShowDialog() == true)
+            {
+                toDoViewModel.LoadFromFileCommandExecute(openFileDialog.FileName);
+            }
+        }
     }
 }

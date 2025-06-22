@@ -37,7 +37,8 @@
                 <TextBox Width="350" Height="40" Text="{Binding TextTask}" />
             </StackPanel>
             <Button Content="Добавить" Command="{Binding AddTaskCommand}" />
-            <!--<Button Content =" Посмотреть" Click ="Button_Click_1" />-->
+            <Button Content="Сохранить в Файл" Command="{Binding SaveTasksToFileCommand}" />
+            <Button Content="Считать из Файла" Command="{Binding LoadTasksFromFileCommand}" />
 
         </StackPanel>
 

@@ -2,46 +2,98 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Model;
 
 namespace ViewModel
 {
     public class ToDoViewModel : INotifyPropertyChanged
     {
         private string _textTask;
-    private TaskViewModel? _selectedTask;
+        private TaskViewModel? _selectedTask;
 
-    public ObservableCollection<TaskViewModel> Tasks { get; set; }
+        public ObservableCollection<TaskViewModel> Tasks { get; set; }
 
-    public TaskViewModel? SelectedTask
-    {
-        get => _selectedTask;
-        set
+        public TaskViewModel? SelectedTask
         {
-            _selectedTask = value;
-            OnPropertyChanged(nameof(SelectedTask));
+            get => _selectedTask;
+            set
+            {
+                _selectedTask = value;
+                OnPropertyChanged(nameof(SelectedTask));
+            }
         }
-    }
 
-    public string TextTask
-    {
-        get => _textTask;
-        set
+        public string TextTask
         {
-            _textTask = value;
-            OnPropertyChanged(nameof(TextTask));
+            get => _textTask;
+            set
+            {
+                _textTask = value;
+                OnPropertyChanged(nameof(TextTask));
+            }
         }
-    }
 
-    public RelayCommand AddTaskCommand { get; set; }
-    public RelayCommand ToggleTaskCompletionCommand { get; set; }
+        public RelayCommand SaveTasksToFileCommand { get; set; }
+        public RelayCommand LoadTasksFromFileCommand { get; set; }
+        public RelayCommand AddTaskCommand { get; set; }
+        public RelayCommand ToggleTaskCompletionCommand { get; set; }
 
-    public ToDoViewModel()
+        // **********************************************************
+        // Сохранение в файл
+        //***********************************************************
+
+        public void SaveToFileCommandExecute(object? parameter)
+        {
+            string filePath = "C:\\Academy\\tasks.txt";
+            var taskModels = new List<TaskModel>();
+
+            foreach (var task in Tasks)
+            {
+                taskModels.Add(new TaskModel
+                {
+                    Name = task.Name,
+                    IsComplete = task.IsCompleted
+                });
+            }
+
+            new TaskManager().Write(taskModels);
+        }
+
+
+        // **********************************************************
+        // Загрузка из файла
+        //***********************************************************
+        public void LoadFromFileCommandExecute(object? parameter)
+        {
+            string filePath = "C:\\Academy\\tasks.txt";
+            var taskModels = new TaskManager().Read();
+
+            Tasks.Clear();
+            foreach (var taskModel in taskModels)
+            {
+                Tasks.Add(new TaskViewModel
+                {
+                    Name = taskModel.Name,
+                    IsCompleted = taskModel.IsComplete
+                });
+            }
+        }
+
+
+        
+
+        // **********************************************************
+        // Добавление task'ов
+        //***********************************************************
+        public ToDoViewModel()
     {
-        Tasks = new ObservableCollection<TaskViewModel>
+                       
+
+            Tasks = new ObservableCollection<TaskViewModel>
         {
             new() 
             { 
-                Name = "Сделать ЛЗ по WPF",
+                Name = "Сделать ДЗ по WPF",
                 IsCompleted = false 
             },
             new()
@@ -53,6 +105,9 @@ namespace ViewModel
 
         AddTaskCommand = new(AddTask);
         ToggleTaskCompletionCommand = new(ToggleTaskCompletion);
+            SaveTasksToFileCommand = new(SaveToFileCommandExecute);
+            LoadTasksFromFileCommand = new(LoadFromFileCommandExecute);
+        
     }
 
         public void ToggleTaskCompletion(object? parameter)
@@ -62,11 +117,7 @@ namespace ViewModel
                 taskViewModel.IsCompleted = !taskViewModel.IsCompleted;
             }
         }
-        //public void ChangeIsComplite (TaskViewModel taskViewModel)
-        //{
-        //    taskViewModel.IsComplete = !taskViewModel.IsComplete;
-        //}
-
+        
         public void AddTask(object? parameter)
         {
             var taskViewModel = new TaskViewModel
